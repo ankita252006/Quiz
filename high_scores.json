@@ -1,0 +1,187 @@
+[
+  {
+    "player_name": "ankitaaa",
+    "score": 5,
+    "max_score": 5,
+    "date": "2026-02-17 12:09:16",
+    "total_time": 166.40434670448303,
+    "category_stats": null
+  },
+  {
+    "player_name": "rr",
+    "score": 5,
+    "max_score": 5,
+    "date": "2026-02-18 11:41:05",
+    "total_time": 37.87878394126892,
+    "category_stats": {
+      "Politics": {
+        "correct": 5,
+        "total": 5
+      }
+    }
+  },
+  {
+    "player_name": "ram",
+    "score": 4,
+    "max_score": 4,
+    "date": "2026-02-16 20:47:15",
+    "total_time": null,
+    "category_stats": null
+  },
+  {
+    "player_name": "krish",
+    "score": 4,
+    "max_score": 4,
+    "date": "2026-02-16 20:51:10",
+    "total_time": null,
+    "category_stats": null
+  },
+  {
+    "player_name": "ram1",
+    "score": 4,
+    "max_score": 4,
+    "date": "2026-02-17 10:37:49",
+    "total_time": null,
+    "category_stats": null
+  },
+  {
+    "player_name": "a1",
+    "score": 3.75,
+    "max_score": 5,
+    "date": "2026-02-18 12:16:55",
+    "total_time": 70.27182221412659,
+    "category_stats": {
+      "Science: Computers": {
+        "correct": 4,
+        "total": 5
+      }
+    }
+  },
+  {
+    "player_name": "radha",
+    "score": 3,
+    "max_score": 4,
+    "date": "2026-02-16 20:53:02",
+    "total_time": null,
+    "category_stats": null
+  },
+  {
+    "player_name": "kk",
+    "score": 2.75,
+    "max_score": 5,
+    "date": "2026-02-18 11:39:08",
+    "total_time": 68.2130217552185,
+    "category_stats": {
+      "Politics": {
+        "correct": 3,
+        "total": 5
+      }
+    }
+  },
+  {
+    "player_name": "A",
+    "score": 2.5,
+    "max_score": 5,
+    "date": "2026-02-18 12:18:25",
+    "total_time": 76.14647364616394,
+    "category_stats": {
+      "Science: Computers": {
+        "correct": 3,
+        "total": 5
+      }
+    }
+  },
+  {
+    "player_name": "sam",
+    "score": 2,
+    "max_score": 2,
+    "date": "2026-02-16 20:49:35",
+    "total_time": null,
+    "category_stats": null
+  },
+  {
+    "player_name": "rai",
+    "score": 2,
+    "max_score": 4,
+    "date": "2026-02-16 20:51:46",
+    "total_time": null,
+    "category_stats": null
+  },
+  {
+    "player_name": "rammm",
+    "score": 2,
+    "max_score": 2,
+    "date": "2026-02-16 22:34:14",
+    "total_time": null,
+    "category_stats": null
+  },
+  {
+    "player_name": "madhav",
+    "score": 2,
+    "max_score": 2,
+    "date": "2026-02-16 22:53:04",
+    "total_time": null,
+    "category_stats": null
+  },
+  {
+    "player_name": "rammm",
+    "score": 2,
+    "max_score": 2,
+    "date": "2026-02-16 22:57:23",
+    "total_time": null,
+    "category_stats": null
+  },
+  {
+    "player_name": "1",
+    "score": 2,
+    "max_score": 2,
+    "date": "2026-02-17 10:36:33",
+    "total_time": null,
+    "category_stats": null
+  },
+  {
+    "player_name": "aaaa",
+    "score": 2,
+    "max_score": 2,
+    "date": "2026-02-17 10:39:09",
+    "total_time": null,
+    "category_stats": null
+  },
+  {
+    "player_name": "ankita1",
+    "score": 2,
+    "max_score": 2,
+    "date": "2026-02-17 10:49:00",
+    "total_time": null,
+    "category_stats": null
+  },
+  {
+    "player_name": "aaa",
+    "score": 1.5,
+    "max_score": 5,
+    "date": "2026-02-17 12:26:19",
+    "total_time": 79.65493893623352,
+    "category_stats": null
+  },
+  {
+    "player_name": "kkk",
+    "score": 1.5,
+    "max_score": 5,
+    "date": "2026-02-17 12:57:58",
+    "total_time": 76.00521326065063,
+    "category_stats": null
+  },
+  {
+    "player_name": "aa",
+    "score": 1.5,
+    "max_score": 5,
+    "date": "2026-02-18 11:06:10",
+    "total_time": 47.014347314834595,
+    "category_stats": {
+      "Entertainment: Film": {
+        "correct": 2,
+        "total": 5
+      }
+    }
+  }
+]
