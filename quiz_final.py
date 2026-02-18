@@ -9,13 +9,11 @@ from dataclasses import dataclass, asdict
 from typing import List, Optional
 from rich.console import Console
 from rich.panel import Panel
-from rich.progress import Progress
 from rich.table import Table
 from rich import box
 
 console = Console()
 
-QUESTIONS_FILE = "questions.json"
 HIGH_SCORES_FILE = "high_scores.json"
 MAX_HIGH_SCORES = 20
 TRIVIA_API_URL = "https://opentdb.com/api.php"
@@ -39,42 +37,10 @@ class Result:
     total_time: Optional[float] = None
     category_stats: Optional[dict] = None
 
-# ---------------- DEFAULT QUESTIONS ----------------
-
-DEFAULT_QUESTIONS = [
-    Question(
-        "What is the capital of France?",
-        ["Berlin", "Madrid", "Paris", "Rome"],
-        2,
-        "Geography",
-        "Easy"
-    ),
-    Question(
-        "Which data structure uses FIFO?",
-        ["Stack", "Queue", "Tree", "Hash Table"],
-        1,
-        "Computer Science",
-        "Medium"
-    ),
-]
-
 # ---------------- STORAGE ----------------
 
 def fetch_questions_from_api(amount=10, category=None, difficulty=None):
-    """
-    Fetch questions from Open Trivia Database API
-    
-    Categories:
-    9: General Knowledge, 10: Books, 11: Film, 12: Music, 
-    13: Musicals & Theatres, 14: Television, 15: Video Games,
-    16: Board Games, 17: Science & Nature, 18: Computers,
-    19: Mathematics, 20: Mythology, 21: Sports, 22: Geography,
-    23: History, 24: Politics, 25: Art, 26: Celebrities,
-    27: Animals, 28: Vehicles, 29: Comics, 30: Gadgets,
-    31: Japanese Anime & Manga, 32: Cartoon & Animations
-    
-    Difficulty: easy, medium, hard
-    """
+    """Fetch questions from Open Trivia Database API"""
     try:
         params = {
             'amount': amount,
@@ -99,14 +65,12 @@ def fetch_questions_from_api(amount=10, category=None, difficulty=None):
         
         questions = []
         for item in data['results']:
-            # Decode HTML entities
             prompt = html.unescape(item['question'])
             correct = html.unescape(item['correct_answer'])
             incorrect = [html.unescape(ans) for ans in item['incorrect_answers']]
             
-            # Combine choices - correct answer at the end
             all_choices = incorrect + [correct]
-            answer_index = len(incorrect)  # Index of correct answer
+            answer_index = len(incorrect)
             
             questions.append(Question(
                 prompt=prompt,
@@ -126,14 +90,6 @@ def fetch_questions_from_api(amount=10, category=None, difficulty=None):
     except Exception as e:
         console.print(f"[red]Error fetching questions: {e}[/red]")
         return None
-
-def load_questions():
-    try:
-        with open(QUESTIONS_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        return [Question(**q) for q in data]
-    except:
-        return DEFAULT_QUESTIONS
 
 def load_high_scores():
     try:
@@ -156,17 +112,13 @@ class QuizGame:
         self.questions = questions
         self.score = 0
         self.negative_marking = negative_marking
-        self.category_stats = {}  # Track performance by category
-        self.question_times = []  # Track time for each question
-        self.player_name = player_name  # Optional pre-set player name
+        self.category_stats = {}
+        self.player_name = player_name
 
     def ask_question(self, q, current, total):
-
         console.clear()
-
         console.print(Panel(f"Question {current}/{total}", style="bold magenta"))
 
-        # For display, shuffle the choices
         indexed = list(enumerate(q.choices))
         random.shuffle(indexed)
         new_indices, shuffled = zip(*indexed)
@@ -185,23 +137,16 @@ class QuizGame:
 
         console.print(question_panel)
 
-        # Track time for this question
-        question_start = time.time()
-
-        # Input validation loop
         while True:
             answer = console.input("[bold white]Your answer (A/B/C/D/skip): [/bold white]").upper()
             
             labels = ["A", "B", "C", "D"]
             
             if answer == "SKIP":
-                question_time = time.time() - question_start
-                self.question_times.append(question_time)
                 correct_answer = shuffled[correct_index]
                 console.print(f"[yellow]Skipped! (0 point)[/yellow]")
                 console.print(f"[yellow]Correct answer was {labels[correct_index]}: {correct_answer}[/yellow]")
                 
-                # Track category stats
                 if q.category not in self.category_stats:
                     self.category_stats[q.category] = {"correct": 0, "total": 0}
                 self.category_stats[q.category]["total"] += 1
@@ -213,10 +158,6 @@ class QuizGame:
             else:
                 console.print("[red]Invalid input! Please enter A, B, C, D, or 'skip'[/red]")
 
-        question_time = time.time() - question_start
-        self.question_times.append(question_time)
-
-        # Track category stats
         if q.category not in self.category_stats:
             self.category_stats[q.category] = {"correct": 0, "total": 0}
         self.category_stats[q.category]["total"] += 1
@@ -239,7 +180,6 @@ class QuizGame:
         console.clear()
         console.print(Panel("Welcome to the Quiz Game", style="bold cyan"))
 
-        # Use pre-set name if provided, otherwise ask for it
         if self.player_name:
             name = self.player_name
             console.print(f"[bold yellow]Player: {name}[/bold yellow]\n")
@@ -248,17 +188,12 @@ class QuizGame:
             name = console.input("[bold yellow]Enter your name: [/bold yellow]")
         
         random.shuffle(self.questions)
-
         total = len(self.questions)
-
-        # Start overall timer
         start_time = time.time()
 
-        # Create progress but don't show it during questions
         for i, q in enumerate(self.questions, 1):
             self.ask_question(q, i, total)
             
-            # Show progress with time only for last 2 questions
             if i >= total - 1:
                 elapsed = time.time() - start_time
                 minutes = int(elapsed // 60)
@@ -268,14 +203,12 @@ class QuizGame:
                 console.print(f"[yellow]Time elapsed: {minutes}m {seconds}s[/yellow]")
                 time.sleep(1)
 
-        # Calculate total time
         total_time = time.time() - start_time
         minutes = int(total_time // 60)
         seconds = int(total_time % 60)
 
         console.clear()
         
-        # Format score display based on negative marking
         if self.negative_marking:
             score_text = f"[bold green]Final Score: {self.score:.2f}/{total}[/bold green]"
         else:
@@ -286,7 +219,6 @@ class QuizGame:
             f"[bold yellow]Total Time: {minutes}m {seconds}s[/bold yellow]"
         ))
         
-        # Show category progress bar
         show_category_progress(self.category_stats)
 
         return Result(
@@ -312,12 +244,10 @@ def show_category_progress(category_stats):
         total = stats["total"]
         percentage = (correct / total * 100) if total > 0 else 0
         
-        # Create visual progress bar
         bar_length = 20
         filled = int(bar_length * correct / total) if total > 0 else 0
         bar = "█" * filled + "░" * (bar_length - filled)
         
-        # Color based on performance
         if percentage >= 80:
             color = "green"
         elif percentage >= 50:
@@ -346,7 +276,6 @@ def show_high_scores():
             seconds = int(r.total_time % 60)
             time_str = f"{minutes}m {seconds}s"
         
-        # Format score - show decimal if it's not a whole number
         if isinstance(r.score, float) and r.score % 1 != 0:
             score_str = f"{r.score:.2f}/{r.max_score}"
         else:
@@ -363,7 +292,6 @@ def multiplayer_mode(questions):
     console.clear()
     console.print(Panel("🎮 Multiplayer Mode", style="bold magenta"))
     
-    # Get player names
     player1_name = console.input("[bold yellow]Player 1 name: [/bold yellow]")
     player2_name = console.input("[bold yellow]Player 2 name: [/bold yellow]")
     
@@ -371,7 +299,6 @@ def multiplayer_mode(questions):
     console.print("[yellow]You will both answer the same questions.[/yellow]")
     console.input("\n[dim]Press Enter to start...[/dim]")
     
-    # Player 1's turn
     console.clear()
     console.print(Panel(f"🎮 {player1_name}'s Turn", style="bold green"))
     
@@ -380,7 +307,6 @@ def multiplayer_mode(questions):
     
     console.input("\n[dim]Press Enter to continue to Player 2...[/dim]")
     
-    # Player 2's turn (same questions)
     console.clear()
     console.print(Panel(f"🎮 {player2_name}'s Turn", style="bold blue"))
     
@@ -389,7 +315,6 @@ def multiplayer_mode(questions):
     
     console.input("\n[dim]Press Enter to see results...[/dim]")
     
-    # Display results
     console.clear()
     console.print(Panel("🏆 Multiplayer Results", style="bold magenta"))
     
@@ -402,7 +327,6 @@ def multiplayer_mode(questions):
     time1_str = f"{int(result1.total_time // 60)}m {int(result1.total_time % 60)}s"
     time2_str = f"{int(result2.total_time // 60)}m {int(result2.total_time % 60)}s"
     
-    # Determine winner
     if result1.score > result2.score:
         winner = player1_name
         results_table.add_row(
@@ -432,7 +356,6 @@ def multiplayer_mode(questions):
             "[green]🏆 WINNER![/green]"
         )
     else:
-        # Tie - compare by time
         if result1.total_time < result2.total_time:
             winner = player1_name
             results_table.add_row(
@@ -462,7 +385,6 @@ def multiplayer_mode(questions):
                 "[green]🏆 WINNER! (Faster)[/green]"
             )
         else:
-            # Perfect tie
             winner = None
             results_table.add_row(
                 player1_name,
@@ -484,7 +406,6 @@ def multiplayer_mode(questions):
     else:
         console.print(f"\n[bold yellow]🤝 Perfect tie! Both players performed equally well![/bold yellow]")
     
-    # Save both results to high scores
     scores = load_high_scores()
     scores.append(result1)
     scores.append(result2)
@@ -493,8 +414,6 @@ def multiplayer_mode(questions):
 # ---------------- MENU ----------------
 
 def main_menu():
-    
-    # Define categories with proper formatting
     categories_dict = {
         1: (9, "GK"),
         2: (18, "Computers"),
@@ -524,11 +443,9 @@ def main_menu():
         choice = console.input("\nChoose option: ")
 
         if choice == "1":
-            # API Quiz options
             console.clear()
             console.print(Panel("Quiz Configuration", style="bold green"))
             
-            # Ask for number of questions with validation
             while True:
                 num_input = console.input("[yellow]Number of questions (5-50, default 10): [/yellow]")
                 if num_input == "":
@@ -543,20 +460,17 @@ def main_menu():
                 except ValueError:
                     console.print("[red]Invalid input! Please enter a valid number.[/red]")
             
-            # Display categories in structured format
             console.print("\n[bold cyan]Categories:[/bold cyan]")
             for i in range(1, 15, 2):
                 if i+1 <= 14:
                     left = f"[cyan]{i}.[/cyan] {categories_dict[i][1]}"
                     right = f"[cyan]{i+1}.[/cyan] {categories_dict[i+1][1]}"
-                    # Use proper spacing - pad left side to 35 characters
                     console.print(f"{left:<35}{right}")
                 else:
                     console.print(f"[cyan]{i}.[/cyan] {categories_dict[i][1]}")
             
             console.print("[dim]Press Enter for random category[/dim]")
             
-            # Category selection with validation
             while True:
                 category_input = console.input("[yellow]Category number (1-14): [/yellow]")
                 if category_input == "":
@@ -572,7 +486,6 @@ def main_menu():
                 except ValueError:
                     console.print("[red]Invalid input! Please enter a valid number.[/red]")
             
-            # Ask for difficulty with validation
             console.print("\n[bold cyan]Difficulty:[/bold cyan]")
             console.print("[cyan]1.[/cyan] Easy")
             console.print("[cyan]2.[/cyan] Medium")
@@ -596,11 +509,9 @@ def main_menu():
                 else:
                     console.print("[red]Invalid input! Please enter 1, 2, or 3.[/red]")
             
-            # Fetch questions
             api_questions = fetch_questions_from_api(num_questions, category, difficulty)
             
             if api_questions:
-                # Negative marking is enabled by default
                 game = QuizGame(api_questions, negative_marking=True)
                 result = game.run()
                 
@@ -612,11 +523,9 @@ def main_menu():
             
             console.input("\nPress Enter to return to menu...")
         elif choice == "2":
-            # Multiplayer Mode
             console.clear()
             console.print(Panel("Multiplayer Quiz Configuration", style="bold green"))
             
-            # Ask for number of questions with validation
             while True:
                 num_input = console.input("[yellow]Number of questions (5-50, default 10): [/yellow]")
                 if num_input == "":
@@ -631,7 +540,6 @@ def main_menu():
                 except ValueError:
                     console.print("[red]Invalid input! Please enter a valid number.[/red]")
             
-            # Display categories in structured format
             console.print("\n[bold cyan]Categories:[/bold cyan]")
             for i in range(1, 15, 2):
                 if i+1 <= 14:
@@ -643,7 +551,6 @@ def main_menu():
             
             console.print("[dim]Press Enter for random category[/dim]")
             
-            # Category selection with validation
             while True:
                 category_input = console.input("[yellow]Category number (1-14): [/yellow]")
                 if category_input == "":
@@ -659,7 +566,6 @@ def main_menu():
                 except ValueError:
                     console.print("[red]Invalid input! Please enter a valid number.[/red]")
             
-            # Ask for difficulty with validation
             console.print("\n[bold cyan]Difficulty:[/bold cyan]")
             console.print("[cyan]1.[/cyan] Easy")
             console.print("[cyan]2.[/cyan] Medium")
@@ -683,7 +589,6 @@ def main_menu():
                 else:
                     console.print("[red]Invalid input! Please enter 1, 2, or 3.[/red]")
             
-            # Fetch questions
             api_questions = fetch_questions_from_api(num_questions, category, difficulty)
             
             if api_questions:
