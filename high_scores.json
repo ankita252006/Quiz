@@ -1,0 +1,132 @@
+[
+  {
+    "player_name": "22",
+    "score": 5,
+    "max_score": 6,
+    "date": "2026-02-21 20:23:44",
+    "total_time": 37.05244040489197,
+    "category_stats": {
+      "Politics": {
+        "correct": 5,
+        "total": 6
+      }
+    }
+  },
+  {
+    "player_name": "11",
+    "score": 5,
+    "max_score": 6,
+    "date": "2026-02-21 20:24:27",
+    "total_time": 39.18566942214966,
+    "category_stats": {
+      "Politics": {
+        "correct": 5,
+        "total": 6
+      }
+    }
+  },
+  {
+    "player_name": "a22",
+    "score": 5,
+    "max_score": 5,
+    "date": "2026-02-21 20:36:19",
+    "total_time": 21.921022415161133,
+    "category_stats": {
+      "Politics": {
+        "correct": 5,
+        "total": 5
+      }
+    }
+  },
+  {
+    "player_name": "b11",
+    "score": 5,
+    "max_score": 5,
+    "date": "2026-02-21 20:36:40",
+    "total_time": 19.668461799621582,
+    "category_stats": {
+      "Politics": {
+        "correct": 5,
+        "total": 5
+      }
+    }
+  },
+  {
+    "player_name": "radha",
+    "score": 5,
+    "max_score": 5,
+    "date": "2026-02-21 20:53:02",
+    "total_time": 23.948397874832153,
+    "category_stats": {
+      "Politics": {
+        "correct": 5,
+        "total": 5
+      }
+    }
+  },
+  {
+    "player_name": "a2",
+    "score": 3.75,
+    "max_score": 6,
+    "date": "2026-02-21 20:52:03",
+    "total_time": 45.655357360839844,
+    "category_stats": {
+      "Politics": {
+        "correct": 4,
+        "total": 6
+      }
+    }
+  },
+  {
+    "player_name": "ram",
+    "score": 3,
+    "max_score": 5,
+    "date": "2026-02-21 20:21:58",
+    "total_time": 26.205272912979126,
+    "category_stats": {
+      "Politics": {
+        "correct": 3,
+        "total": 5
+      }
+    }
+  },
+  {
+    "player_name": "aa",
+    "score": 2.75,
+    "max_score": 5,
+    "date": "2026-02-21 20:35:24",
+    "total_time": 25.141957759857178,
+    "category_stats": {
+      "Politics": {
+        "correct": 3,
+        "total": 5
+      }
+    }
+  },
+  {
+    "player_name": "a1",
+    "score": 2.5,
+    "max_score": 6,
+    "date": "2026-02-21 20:50:58",
+    "total_time": 41.73928475379944,
+    "category_stats": {
+      "Politics": {
+        "correct": 3,
+        "total": 6
+      }
+    }
+  },
+  {
+    "player_name": "shyam",
+    "score": 1,
+    "max_score": 1,
+    "date": "2026-02-21 20:37:51",
+    "total_time": 7.7334513664245605,
+    "category_stats": {
+      "Politics": {
+        "correct": 1,
+        "total": 1
+      }
+    }
+  }
+]
