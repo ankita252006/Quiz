@@ -18,6 +18,12 @@ HIGH_SCORES_FILE = "high_scores.json"
 MAX_HIGH_SCORES = 20
 TRIVIA_API_URL = "https://opentdb.com/api.php"
 
+# Import fallback questions
+try:
+    from fallback_questions import FALLBACK_QUESTIONS
+except ImportError:
+    FALLBACK_QUESTIONS = []
+
 # ---------------- DATA MODELS ----------------
 
 @dataclass
@@ -39,8 +45,90 @@ class Result:
 
 # ---------------- STORAGE ----------------
 
+def load_fallback_questions(amount=10, category=None, difficulty=None):
+    """Load questions from fallback bank when API is unavailable"""
+    if not FALLBACK_QUESTIONS:
+        return None
+    
+    # Category mapping: API ID -> Category name in fallback
+    category_map = {
+        9: "General Knowledge",
+        18: "Science: Computers",
+        21: "Sports",
+        22: "Geography",
+        23: "History",
+        17: "Science & Nature",
+        10: "Entertainment: Books",
+        11: "Entertainment: Film",
+        12: "Entertainment: Music",
+        15: "Entertainment: Video Games",
+        20: "Mythology",
+        27: "Animals",
+        24: "Politics",
+        29: "Entertainment: Comics"
+    }
+    
+    # Start with all questions
+    available_questions = list(FALLBACK_QUESTIONS)
+    
+    # Filter by category if specified
+    if category and category in category_map:
+        cat_name = category_map[category]
+        # ALWAYS filter by category first - we must stay in the requested category
+        available_questions = [q for q in available_questions if q.get("category") == cat_name]
+        
+        # If category has questions, try to filter by difficulty too
+        if difficulty and available_questions:
+            difficulty_cap = difficulty.capitalize()
+            difficulty_filtered = [q for q in available_questions if q.get("difficulty") == difficulty_cap]
+            
+            # If we have enough with the specific difficulty, use those
+            if len(difficulty_filtered) >= amount:
+                available_questions = difficulty_filtered
+            # Otherwise, use all questions from the category (mixed difficulties)
+            # This way we stay in the category but relax difficulty requirement
+    
+    # No category specified - filter by difficulty only if specified
+    elif difficulty:
+        difficulty_cap = difficulty.capitalize()
+        difficulty_filtered = [q for q in available_questions if q.get("difficulty") == difficulty_cap]
+        if len(difficulty_filtered) >= amount:
+            available_questions = difficulty_filtered
+    
+    # Ensure we have questions
+    if len(available_questions) == 0:
+        return None
+    
+    # If we don't have enough unique questions, repeat some to reach the amount
+    if len(available_questions) < amount:
+        # Use all available questions multiple times if needed
+        selected = []
+        while len(selected) < amount:
+            # Add all available questions
+            selected.extend(available_questions)
+        # Trim to exact amount needed
+        selected = selected[:amount]
+        # Shuffle to randomize the order
+        random.shuffle(selected)
+    else:
+        # Random selection without replacement
+        selected = random.sample(available_questions, amount)
+    
+    # Convert to Question objects
+    questions = []
+    for item in selected:
+        questions.append(Question(
+            prompt=item["prompt"],
+            choices=item["choices"],
+            answer_index=item["answer_index"],
+            category=item.get("category", "General Knowledge"),
+            difficulty=item.get("difficulty", "Medium")
+        ))
+    
+    return questions
+
 def fetch_questions_from_api(amount=10, category=None, difficulty=None):
-    """Fetch questions from Open Trivia Database API"""
+    """Fetch questions from Open Trivia Database API with seamless fallback"""
     try:
         params = {
             'amount': amount,
@@ -53,15 +141,15 @@ def fetch_questions_from_api(amount=10, category=None, difficulty=None):
         if difficulty:
             params['difficulty'] = difficulty
         
-        console.print("[yellow]Fetching questions from API...[/yellow]")
+        console.print("[yellow]Loading questions...[/yellow]")
         response = requests.get(TRIVIA_API_URL, params=params, timeout=10)
         response.raise_for_status()
         
         data = response.json()
         
         if data['response_code'] != 0:
-            console.print("[red]API Error: Could not fetch questions[/red]")
-            return None
+            # API error - silently fallback
+            return load_fallback_questions(amount, category, difficulty)
         
         questions = []
         for item in data['results']:
@@ -80,15 +168,17 @@ def fetch_questions_from_api(amount=10, category=None, difficulty=None):
                 difficulty=item['difficulty'].capitalize()
             ))
         
-        console.print(f"[green]Successfully fetched {len(questions)} questions![/green]")
+        console.print(f"[green]Successfully loaded {len(questions)} questions![/green]")
         time.sleep(1)
         return questions
         
-    except requests.RequestException as e:
-        console.print(f"[red]Network error: {e}[/red]")
-        return None
-    except Exception as e:
-        console.print(f"[red]Error fetching questions: {e}[/red]")
+    except (requests.RequestException, Exception):
+        # Network error or any other error - silently fallback
+        fallback = load_fallback_questions(amount, category, difficulty)
+        if fallback:
+            console.print(f"[green]Successfully loaded {len(fallback)} questions![/green]")
+            time.sleep(1)
+            return fallback
         return None
 
 def load_high_scores():
